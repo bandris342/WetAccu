@@ -19,11 +19,10 @@
 
 from __future__ import unicode_literals
 
-
 from weboob.browser.pages import JsonPage, HTMLPage
 from weboob.browser.filters.json import Dict
 from weboob.browser.elements import ItemElement, method, DictElement
-from weboob.capabilities.weather import Forecast, Current, City, Temperature
+from weboob.capabilities.weather import Forecast, Current, City, Temperature, CityNotFound
 from weboob.browser.filters.standard import Format, CleanText, CleanDecimal
 from datetime import date
 
@@ -45,7 +44,9 @@ class CityPage(JsonPage):
                               Dict['Country']['LocalizedName'])
 
 
+
 class WeatherPage(HTMLPage):
+
     @method
     class get_current(ItemElement):
         klass = Current

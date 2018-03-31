@@ -19,12 +19,13 @@
 
 from __future__ import unicode_literals
 
+from collections import OrderedDict
 
-from weboob.tools.backend import Module
-from weboob.capabilities.weather import CapWeather
+from weboob.tools.backend import Module, BackendConfig
+from weboob.capabilities.weather import CapWeather, CityNotFound
+from weboob.tools.value import Value
 
 from .browser import WetaccuBrowser
-
 
 __all__ = ['WetaccuModule']
 
@@ -43,7 +44,10 @@ class WetaccuModule(Module, CapWeather):
         return self.browser.get_current(city_id)
 
     def iter_city_search(self, pattern):
-        return self.browser.iter_city_search(pattern)
+        if list(self.browser.iter_city_search(pattern))==[]:
+            raise CityNotFound('City not found: %s' % pattern)
+        else:
+            return self.browser.iter_city_search(pattern)
 
     def iter_forecast(self, city_id):
         """
