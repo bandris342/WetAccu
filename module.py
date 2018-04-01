@@ -19,11 +19,8 @@
 
 from __future__ import unicode_literals
 
-from collections import OrderedDict
-
-from weboob.tools.backend import Module, BackendConfig
+from weboob.tools.backend import Module
 from weboob.capabilities.weather import CapWeather, CityNotFound
-from weboob.tools.value import Value
 
 from .browser import WetaccuBrowser
 
@@ -33,7 +30,7 @@ __all__ = ['WetaccuModule']
 class WetaccuModule(Module, CapWeather):
     NAME = 'wetaccu'
     DESCRIPTION = 'accuweather.com website'
-    MAINTAINER = 'bandris342'
+    MAINTAINER = u'Andras Bartok'
     EMAIL = 'andras.bartok@gmail.com'
     LICENSE = 'AGPLv3+'
     VERSION = '1.4'

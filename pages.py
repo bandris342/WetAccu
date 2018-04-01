@@ -22,10 +22,9 @@ from __future__ import unicode_literals
 from weboob.browser.pages import JsonPage, HTMLPage
 from weboob.browser.filters.json import Dict
 from weboob.browser.elements import ItemElement, method, DictElement
-from weboob.capabilities.weather import Forecast, Current, City, Temperature, CityNotFound
+from weboob.capabilities.weather import Forecast, Current, City, Temperature
 from weboob.browser.filters.standard import Format, CleanText, CleanDecimal
 from datetime import date
-
 
 class CityPage(JsonPage):
     ENCODING = 'utf-8'
@@ -45,7 +44,7 @@ class CityPage(JsonPage):
 
 
 
-class WeatherPage(HTMLPage):
+class CurrentPage(HTMLPage):
 
     @method
     class get_current(ItemElement):
@@ -55,19 +54,14 @@ class WeatherPage(HTMLPage):
 
         def obj_temp(self):
 
-             temp = CleanDecimal('//*[@id="detail-now"]/div/div[1]/div[2]/div/span[1]')(self)
-             temp_unit = CleanText('//*[@id="feed-tabs"]/ul/li[1]/div/div[2]/div/span[2]')(self)
-             if temp_unit[-1]=='F':
-                return Temperature(temp, 'F')
-             else:
-                return Temperature(temp, 'C')
+             temp = CleanDecimal('//*[@id="day-part"]/div[2]/span[1]/b')(self)
+             return Temperature(temp, 'C')
 
-
-        obj_text = Format('%s - Wind %s - Humidity %s - Pressure %s',
-                          CleanText('//*[@id="detail-now"]/div/div[1]/div[2]/span'),
-                          CleanText('//*[@id="detail-now"]/div/div[2]/ul/li[2]/strong'),
-                          CleanText('//*[@id="detail-now"]/div/div[2]/ul/li[3]/strong'),
-                          CleanText('//*[@id="detail-now"]/div/div[2]/ul/li[4]/strong'))
+        obj_text = Format('%s - Wind from the %s - Humidity %s - Pressure %s',
+                          CleanText('//*[@id="day-part"]/p[1]'),
+                          CleanText('//*[@class="d-wrap wind"]/p/span/text()[2]'),
+                          CleanText('//*[@id="details"]/div[5]/p'),
+                          CleanText('//*[@id="day-part"]/p[2]/text()'))
 
 
 

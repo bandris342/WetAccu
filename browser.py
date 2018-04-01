@@ -22,20 +22,24 @@ from __future__ import unicode_literals
 
 from weboob.browser import PagesBrowser, URL
 
-from .pages import CityPage, WeatherPage
+from .pages import CityPage, CurrentPage
+
 
 
 class WetaccuBrowser(PagesBrowser):
 
-    BASEURL = 'https://www.accuweather.com'
+    BASEURL = 'https://m.accuweather.com'
     API_KEY = 'd41dfd5e8a1748d0970cba6637647d96'
+
+    setCelsiusPage = URL('https://m.accuweather.com/en/settings/to-celsius')
 
     city_page = URL('https://api\.accuweather\.com/locations/v1/cities/autocomplete\?q=(?P<pattern>.*)&apikey=(?P<api>.*)&language=fr&get_param=value', CityPage)
 
-    weather_page = URL('/en/fr/blabla/99/current-weather/(?P<city_id>.*)', WeatherPage)
+    current_page = URL('/en/us/blabla/99/current-weather/(?P<city_id>.*)', CurrentPage)
 
     def iter_city_search(self, pattern):
         return self.city_page.go(pattern=pattern, api=self.API_KEY).iter_cities()
 
     def get_current(self, city_id):
-        return self.weather_page.go(city_id=city_id).get_current()
+        self.setCelsiusPage.go(method='POST')   #Config the site to International System of Units (Celsius, kPa, km/h)
+        return self.current_page.go(city_id=city_id).get_current()
