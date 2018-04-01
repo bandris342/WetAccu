@@ -72,11 +72,11 @@ class ForecastPage(HTMLPage):
 
         class item(ItemElement):
             klass = Forecast
-            obj_id = CleanText('./a/dl/dt/text()[2]')
 
             obj_date = Format('%s  %s',
                               CleanText('./a/dl/dt/b'),
                               CleanText('./a/dl/dt/text()[2]'))
+            obj_id = obj_date
 
             obj_text = Format('- %s - Precipitation %s',
                               CleanText('./a/dl/dd[2]'),
