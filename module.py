@@ -30,7 +30,7 @@ __all__ = ['WetaccuModule']
 class WetaccuModule(Module, CapWeather):
     NAME = 'wetaccu'
     DESCRIPTION = 'accuweather.com website'
-    MAINTAINER = u'Andras Bartok'
+    MAINTAINER = 'Andras Bartok'
     EMAIL = 'andras.bartok@gmail.com'
     LICENSE = 'AGPLv3+'
     VERSION = '1.4'
@@ -47,11 +47,4 @@ class WetaccuModule(Module, CapWeather):
             return self.browser.iter_city_search(pattern)
 
     def iter_forecast(self, city_id):
-        """
-        Iter forecasts of a city.
-
-        :param city_id: ID of the city
-        :rtype: iter[:class:`Forecast`]
-        """
-        raise NotImplementedError()
-
+        return self.browser.iter_forecast(city_id)

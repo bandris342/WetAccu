@@ -21,7 +21,7 @@ from __future__ import unicode_literals
 
 from weboob.browser.pages import JsonPage, HTMLPage
 from weboob.browser.filters.json import Dict
-from weboob.browser.elements import ItemElement, method, DictElement
+from weboob.browser.elements import ItemElement, ListElement, method, DictElement
 from weboob.capabilities.weather import Forecast, Current, City, Temperature
 from weboob.browser.filters.standard import Format, CleanText, CleanDecimal
 from datetime import date
@@ -37,7 +37,7 @@ class CityPage(JsonPage):
             klass = City
 
             obj_id = Dict('Key')
-            obj_name = Format('%s (%s - %s)',
+            obj_name = Format('%s, %s, %s',
                               Dict('LocalizedName'),
                               Dict['AdministrativeArea']['LocalizedName'],
                               Dict['Country']['LocalizedName'])
@@ -54,15 +54,37 @@ class CurrentPage(HTMLPage):
 
         def obj_temp(self):
 
-             temp = CleanDecimal('//*[@id="day-part"]/div[2]/span[1]/b')(self)
+             temp = CleanDecimal('//*[@class="current temp-block"]/span[1]/b')(self)
              return Temperature(temp, 'C')
 
         obj_text = Format('%s - Wind from the %s - Humidity %s - Pressure %s',
-                          CleanText('//*[@id="day-part"]/p[1]'),
+                          CleanText('//*[@class="cond"]'),
                           CleanText('//*[@class="d-wrap wind"]/p/span/text()[2]'),
-                          CleanText('//*[@id="details"]/div[5]/p'),
-                          CleanText('//*[@id="day-part"]/p[2]/text()'))
+                          CleanText('//*[@class="d-wrap hum"]/p'),
+                          CleanText('//*[@class="info pressure"]/text()'))
 
 
+class ForecastPage(HTMLPage):
 
+    @method
+    class iter_forecast(ListElement):
+        item_xpath = '//*[@id="extended"]/ul/li[position()=3 or (12>position() and position()>4) or (20>position() and position()>12)]'
 
+        class item(ItemElement):
+            klass = Forecast
+            obj_id = CleanText('./a/dl/dt/text()[2]')
+            obj_date = Format('%s  %s',
+                              CleanText('./a/dl/dt/b'),
+                              CleanText('./a/dl/dt/text()[2]'))
+
+            obj_text = Format('- %s - Precipitation %s',
+                              CleanText('./a/dl/dd[2]'),
+                              CleanText('./a/dl/dd[1]/em'))
+
+            def obj_low(self):
+                temp = CleanDecimal('./a/dl/dd[1]/b')(self)
+                return Temperature(temp, 'C')
+
+            def obj_high(self):
+                temp = CleanDecimal('./a/dl/dd[1]/strong')(self)
+                return Temperature(temp, 'C')
