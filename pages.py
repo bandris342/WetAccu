@@ -73,6 +73,7 @@ class ForecastPage(HTMLPage):
         class item(ItemElement):
             klass = Forecast
             obj_id = CleanText('./a/dl/dt/text()[2]')
+
             obj_date = Format('%s  %s',
                               CleanText('./a/dl/dt/b'),
                               CleanText('./a/dl/dt/text()[2]'))
@@ -81,10 +82,18 @@ class ForecastPage(HTMLPage):
                               CleanText('./a/dl/dd[2]'),
                               CleanText('./a/dl/dd[1]/em'))
 
+            # In the late afternoon (forecast "Tonight") only the Min temperature is shown
             def obj_low(self):
-                temp = CleanDecimal('./a/dl/dd[1]/b')(self)
-                return Temperature(temp, 'C')
+                low_text = CleanText('./a/dl/dd[1]/b')(self)
+                if low_text:
+                    temp = CleanDecimal('./a/dl/dd[1]/b')(self)
+                    return Temperature(temp, 'C')
+                else:
+                    temp = CleanDecimal('./a/dl/dd[1]/strong')(self)
+                    return Temperature(temp, 'C')
 
             def obj_high(self):
-                temp = CleanDecimal('./a/dl/dd[1]/strong')(self)
-                return Temperature(temp, 'C')
+                low_text = CleanText('./a/dl/dd[1]/b')(self)
+                if low_text:
+                    temp = CleanDecimal('./a/dl/dd[1]/strong')(self)
+                    return Temperature(temp, 'C')
