@@ -21,7 +21,7 @@ from __future__ import unicode_literals
 
 from weboob.browser.pages import JsonPage, HTMLPage
 from weboob.browser.filters.json import Dict
-from weboob.browser.elements import ItemElement, ListElement, method, DictElement
+from weboob.browser.elements import ItemElement, ListElement, method, DictElement, SkipItem
 from weboob.capabilities.weather import Forecast, Current, City, Temperature
 from weboob.browser.filters.standard import Format, CleanText, CleanDecimal
 from datetime import date
@@ -68,9 +68,10 @@ class ForecastPage(HTMLPage):
 
     @method
     class iter_forecast(ListElement):
-        item_xpath = '//*[@id="extended"]/ul/li[position()=3 or (12>position() and position()>4) or (20>position() and position()>12)]'
+        item_xpath = '//*[@id="extended"]/ul/li[position()>2]'
 
         class item(ItemElement):
+
             klass = Forecast
 
             obj_date = Format('%s  %s',
@@ -82,8 +83,13 @@ class ForecastPage(HTMLPage):
                               CleanText('./a/dl/dd[2]'),
                               CleanText('./a/dl/dd[1]/em'))
 
-            # In the late afternoon (forecast "Tonight") only the Min temperature is shown
+
             def obj_low(self):
+                high_text = CleanText('./a/dl/dd[1]/strong')(self)
+                if not high_text :  #Filter the separator boards
+                    raise SkipItem()
+
+                # In the late afternoon (forecast "Tonight") only the Min temperature is shown
                 low_text = CleanText('./a/dl/dd[1]/b')(self)
                 if low_text:
                     temp = CleanDecimal('./a/dl/dd[1]/b')(self)
@@ -91,6 +97,8 @@ class ForecastPage(HTMLPage):
                 else:
                     temp = CleanDecimal('./a/dl/dd[1]/strong')(self)
                     return Temperature(temp, 'C')
+
+
 
             def obj_high(self):
                 low_text = CleanText('./a/dl/dd[1]/b')(self)
