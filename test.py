@@ -31,6 +31,6 @@ class WetaccuTest(BackendTest):
         self.assertTrue(len(l) > 0)
         city = l[0]
         current = self.backend.get_current(city.id)
-        self.assertTrue(current.temp.value > -50 and current.temp.value < 50)
+        self.assertTrue(current.temp.value is float(current.temp.value))
         forecasts = list(self.backend.iter_forecast(city.id))
-        self.assertTrue(len(forecasts) > 0)
+        self.assertTrue(len(forecasts) > 10)
