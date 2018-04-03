@@ -23,7 +23,7 @@ from weboob.browser.pages import JsonPage, HTMLPage
 from weboob.browser.filters.json import Dict
 from weboob.browser.elements import ItemElement, ListElement, method, DictElement, SkipItem
 from weboob.capabilities.weather import Forecast, Current, City, Temperature
-from weboob.browser.filters.standard import Format, CleanText, CleanDecimal
+from weboob.browser.filters.standard import Format, CleanText, CleanDecimal, Date
 from datetime import datetime
 
 class CityPage(JsonPage):
@@ -74,9 +74,16 @@ class ForecastPage(HTMLPage):
 
             klass = Forecast
 
-            obj_date = Format('%s  %s',
+            def obj_date(self):
+
+                # Filter the separator boards
+                high_text = CleanText('./a/dl/dd[1]/strong')(self)
+                if not high_text:
+                    raise SkipItem()
+
+                return Format('%s  %s',
                               CleanText('./a/dl/dt/b'),
-                              CleanText('./a/dl/dt/text()[2]'))
+                              Date(CleanText('./a/dl/dt/text()[2]'), dayfirst=False))(self)
 
             obj_id = obj_date
 
@@ -86,10 +93,6 @@ class ForecastPage(HTMLPage):
 
 
             def obj_low(self):
-                high_text = CleanText('./a/dl/dd[1]/strong')(self)
-                if not high_text :  #Filter the separator boards
-                    raise SkipItem()
-
                 # In the late afternoon (forecast "Tonight") only the Min temperature is shown
                 low_text = CleanText('./a/dl/dd[1]/b')(self)
                 if low_text:
