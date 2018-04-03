@@ -55,7 +55,7 @@ class CurrentPage(HTMLPage):
         def obj_temp(self):
 
              temp = CleanDecimal('//*[@class="current temp-block"]/span[1]/b')(self)
-             return Temperature(temp, 'C')
+             return Temperature(float(temp), 'C')
 
         obj_text = Format('%s - Wind from the %s - Humidity %s - Pressure %s',
                           CleanText('//*[@class="cond"]'),
@@ -94,14 +94,14 @@ class ForecastPage(HTMLPage):
                 low_text = CleanText('./a/dl/dd[1]/b')(self)
                 if low_text:
                     temp = CleanDecimal('./a/dl/dd[1]/b')(self)
-                    return Temperature(temp, 'C')
+                    return Temperature(float(temp), 'C')
                 else:
                     temp = CleanDecimal('./a/dl/dd[1]/strong')(self)
-                    return Temperature(temp, 'C')
+                    return Temperature(float(temp), 'C')
 
 
             def obj_high(self):
                 low_text = CleanText('./a/dl/dd[1]/b')(self)
                 if low_text:
                     temp = CleanDecimal('./a/dl/dd[1]/strong')(self)
-                    return Temperature(temp, 'C')
+                    return Temperature(float(temp), 'C')
