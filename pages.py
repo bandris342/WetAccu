@@ -77,6 +77,7 @@ class ForecastPage(HTMLPage):
             obj_date = Format('%s  %s',
                               CleanText('./a/dl/dt/b'),
                               CleanText('./a/dl/dt/text()[2]'))
+
             obj_id = obj_date
 
             obj_text = Format('- %s - Precipitation %s',
@@ -97,7 +98,6 @@ class ForecastPage(HTMLPage):
                 else:
                     temp = CleanDecimal('./a/dl/dd[1]/strong')(self)
                     return Temperature(temp, 'C')
-
 
 
             def obj_high(self):
