@@ -24,7 +24,7 @@ from weboob.browser.filters.json import Dict
 from weboob.browser.elements import ItemElement, ListElement, method, DictElement, SkipItem
 from weboob.capabilities.weather import Forecast, Current, City, Temperature
 from weboob.browser.filters.standard import Format, CleanText, CleanDecimal
-from datetime import date
+from datetime import datetime
 
 class CityPage(JsonPage):
     ENCODING = 'utf-8'
@@ -50,7 +50,7 @@ class CurrentPage(HTMLPage):
     class get_current(ItemElement):
         klass = Current
 
-        obj_date = date.today()
+        obj_date = datetime.today().replace(microsecond=0)
 
         def obj_temp(self):
 
